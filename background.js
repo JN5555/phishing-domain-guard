@@ -16,6 +16,37 @@ function setBadge(tabId,text,color,title){chrome.action.setBadgeText({tabId,text
 
 async function currentData(){const s=await getSettings();const entities=await getProtectedEntities(s);return{s,entities};}
 
+async function refreshBadgeForUrl(tabId,url,data=null){
+  if(tabId==null)return;
+  const u=parseHttp(url);
+  if(!u){setBadge(tabId,'','',chrome.runtime.getManifest().name);return;}
+  await ensurePsl();
+  const {s,entities}=data||await currentData();
+  const reg=registrable(u.hostname.toLowerCase());
+  const off=officialMatch(u.hostname,entities);
+  if(off){setBadge(tabId,'✓','#16803b',`Ověřená chráněná doména: ${off.entity.name}`);return;}
+  if(s.userProtected.includes(reg)){setBadge(tabId,'✓','#2563eb',`Uživatelsky chráněná doména: ${reg}`);return;}
+  setBadge(tabId,'','',chrome.runtime.getManifest().name);
+}
+
+async function refreshAllBadges(){
+  await ensurePsl();
+  const data=await currentData();
+  const tabs=await chrome.tabs.query({});
+  await Promise.allSettled(tabs.map(async tab=>{
+    if(tab?.id==null)return;
+    // `tabs.query()` does not expose tab.url without the broad `tabs` permission.
+    // webNavigation already has the URL access this extension needs, so read the
+    // current main-frame URL through that API instead of requesting more rights.
+    try{
+      const frame=await chrome.webNavigation.getFrame({tabId:tab.id,frameId:0});
+      await refreshBadgeForUrl(tab.id,frame?.url||'',data);
+    }catch{
+      setBadge(tab.id,'','',chrome.runtime.getManifest().name);
+    }
+  }));
+}
+
 chrome.webNavigation.onBeforeNavigate.addListener(async d=>{
   if(d.frameId!==0)return; const u=parseHttp(d.url);if(!u)return; await ensurePsl();
   const {allowed={}}=await chrome.storage.session.get('allowed'); if(allowed[u.hostname])return;
@@ -28,10 +59,8 @@ chrome.webNavigation.onBeforeNavigate.addListener(async d=>{
 
 chrome.webNavigation.onCommitted.addListener(d=>{if(d.frameId===0)chrome.action.setBadgeText({tabId:d.tabId,text:''});});
 chrome.webNavigation.onCompleted.addListener(async d=>{
-  if(d.frameId!==0)return;const u=parseHttp(d.url);if(!u)return;await ensurePsl();
-  const {s,entities}=await currentData();const reg=registrable(u.hostname.toLowerCase());const off=officialMatch(u.hostname,entities);
-  if(off)setBadge(d.tabId,'✓','#16803b',`Ověřená chráněná doména: ${off.entity.name}`);
-  else if(s.userProtected.includes(reg))setBadge(d.tabId,'✓','#2563eb',`Uživatelsky chráněná doména: ${reg}`);
+  if(d.frameId!==0)return;
+  try{await refreshBadgeForUrl(d.tabId,d.url);}catch{}
 });
 
 async function handlePassword(tab){
@@ -60,6 +89,7 @@ async function refreshRemote(){
   try{
     const rec=await syncRemoteList(s.remoteList.url);
     await setRemoteStatus(true,{disabled:false,error:'',fetchedAt:rec.fetchedAt,url:rec.url,version:rec.version,count:rec.entities.length,hash:rec.hash});
+    await refreshAllBadges();
     return{ok:true,count:rec.entities.length,version:rec.version,hash:rec.hash};
   }catch(e){
     await setRemoteStatus(false,{disabled:false,error:e?.message||String(e),url:s.remoteList.url});
@@ -80,24 +110,31 @@ async function configureRemoteAlarm(syncIfDue=false){
   }
 }
 
+chrome.storage.onChanged.addListener((changes,area)=>{
+  const affectsBadges=(area==='local'&&changes.remoteProtectedList)||(area==='sync'&&(changes.userProtected||changes.remoteList));
+  if(affectsBadges) refreshAllBadges();
+});
+
 chrome.runtime.onMessage.addListener((msg,sender,sendResponse)=>{
   if(msg.type==='passwordField'&&sender.tab){handlePassword(sender.tab).then(sendResponse,()=>sendResponse(null));return true;}
   if(msg.type==='trust'&&sender.tab){trustTab(sender.tab).then(()=>sendResponse(true));return true;}
   if(msg.type==='refreshFeeds'){refresh().then(sendResponse);return true;}
   if(msg.type==='refreshProtectedList'){refreshRemote().then(sendResponse);return true;}
-  if(msg.type==='configureProtectedList'){configureRemoteAlarm(true).then(()=>sendResponse({ok:true}));return true;}
-  if(msg.type==='clearProtectedListCache'){clearRemoteList().then(async()=>{await chrome.storage.local.remove('remoteListStatus');sendResponse({ok:true});});return true;}
+  if(msg.type==='configureProtectedList'){configureRemoteAlarm(true).then(async()=>{await refreshAllBadges();sendResponse({ok:true});});return true;}
+  if(msg.type==='clearProtectedListCache'){clearRemoteList().then(async()=>{await chrome.storage.local.remove('remoteListStatus');await refreshAllBadges();sendResponse({ok:true});});return true;}
 });
 
 chrome.runtime.onInstalled.addListener(async()=>{
   await hardenStorage();await ensurePsl();
   await chrome.alarms.create('feeds',{periodInMinutes:360});
   await configureRemoteAlarm(true);
+  await refreshAllBadges();
   refresh();
 });
 chrome.runtime.onStartup.addListener(async()=>{
   await hardenStorage();await ensurePsl();
   await chrome.alarms.create('feeds',{periodInMinutes:360});
   await configureRemoteAlarm(true);
+  await refreshAllBadges();
 });
 chrome.alarms.onAlarm.addListener(a=>{if(a.name==='feeds')refresh();if(a.name===REMOTE_ALARM)refreshRemote();});

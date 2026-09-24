@@ -91,9 +91,15 @@ export async function syncRemoteList(urlInput) {
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 15000);
+  // Add a unique query parameter for each request. GitHub Raw is served via a CDN
+  // and may briefly return a stale copy immediately after a push. The stored
+  // canonical URL remains unchanged; the cache-buster is used only for fetch().
+  const fetchUrl = new URL(url);
+  fetchUrl.searchParams.set('_pdg', String(Date.now()));
+
   let response;
   try {
-    response = await fetch(url, { cache: 'no-store', credentials: 'omit', signal: controller.signal });
+    response = await fetch(fetchUrl.toString(), { cache: 'no-store', credentials: 'omit', signal: controller.signal });
   } finally { clearTimeout(timer); }
   if (!response.ok) throw new Error(`GitHub vrátil HTTP ${response.status}.`);
 

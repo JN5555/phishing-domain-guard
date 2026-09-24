@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Phishing Domain Guard",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Warns about phishing sites, lookalike domains, protected brands, and risky sign-in pages.",
   "permissions": [
     "webNavigation",

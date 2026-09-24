@@ -513,6 +513,21 @@
         "mojeid",
         "moje id"
       ]
+    },
+    {
+      "name": "csob penze",
+      "id": "csob-penze",
+      "category": "finance",
+      "source": "csob.cz",
+      "domains": [
+        "csob-penze.cz"
+      ],
+      "hosts": [
+        "online.csob-penze.cz"
+      ],
+      "brands": [
+        "csob penze"
+      ]
     }
   ],
   "disabledIds": []

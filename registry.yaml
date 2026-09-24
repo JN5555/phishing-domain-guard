@@ -1,0 +1,105 @@
+name: Phishing Domain Guard
+file: protected-list.json
+items_key: entities
+id_field: id
+display_field: name
+metadata_date_field: updated
+
+fields:
+  name:
+    type: string
+    required: true
+    label:
+      en: Service or institution name
+      cs: Název služby nebo instituce
+    help:
+      en: The public name users know, for example a bank, news site, or public service.
+      cs: Veřejný název, který uživatel zná – například banka, médium nebo veřejná služba.
+    example:
+      en: ČSOB Pension Company
+      cs: ČSOB Penzijní společnost
+
+  id:
+    type: slug
+    required: true
+    unique: true
+    label:
+      en: Internal ID
+      cs: Interní ID
+    help:
+      en: Stable technical identifier. A value is suggested automatically from the name; usually you can accept it.
+      cs: Stabilní technický identifikátor. Program ho navrhne automaticky z názvu; většinou stačí návrh potvrdit.
+    example:
+      en: csob-penze
+      cs: csob-penze
+
+  category:
+    type: choice
+    required: true
+    values: [bank, finance, media, public, identity, other]
+    value_labels:
+      bank: { en: Bank, cs: Banka }
+      finance: { en: Finance / pension / insurance, cs: Finance / penze / pojištění }
+      media: { en: Media, cs: Média }
+      public: { en: Public institution, cs: Veřejná instituce }
+      identity: { en: Identity service, cs: Identita }
+      other: { en: Other, cs: Ostatní }
+    label:
+      en: Category
+      cs: Kategorie
+    help:
+      en: Used only to group protected entries. Choose the closest category.
+      cs: Slouží hlavně k přehlednému zařazení položky. Vyberte nejbližší kategorii.
+
+  source:
+    type: string
+    label:
+      en: Verification source
+      cs: Zdroj ověření
+    help:
+      en: Where the official domain was verified. This is optional but recommended.
+      cs: Odkud je ověřeno, že doména patří dané službě. Pole je volitelné, ale doporučené.
+    example:
+      en: Official website + regulator
+      cs: Oficiální web + ČNB
+
+  domains:
+    type: list
+    required: true
+    validator: hostname
+    unique: true
+    label:
+      en: Official main domain(s)
+      cs: Oficiální hlavní doména / domény
+    help:
+      en: Main legitimate websites. You may paste a full URL; JRM stores only the domain.
+      cs: Hlavní legitimní weby služby. Můžete vložit i celou URL; JRM z ní uloží jen doménu.
+    example:
+      en: csob-penze.cz
+      cs: csob-penze.cz
+
+  hosts:
+    type: list
+    validator: hostname
+    unique: true
+    label:
+      en: Other official addresses
+      cs: Další oficiální adresy
+    help:
+      en: Optional. Use this only when the service has another official address, such as a separate login portal. If you do not know any, leave it empty.
+      cs: Volitelné. Vyplňte jen pokud služba používá další oficiální adresu, například samostatný přihlašovací portál. Pokud o žádné nevíte, nechte pole prázdné.
+    example:
+      en: online.csob-penze.cz or https://online.csob-penze.cz/login
+      cs: online.csob-penze.cz nebo https://online.csob-penze.cz/login
+
+  brands:
+    type: list
+    label:
+      en: Protected names / aliases
+      cs: Názvy chráněné před napodobením
+    help:
+      en: Optional names an attacker could imitate in a fake domain. Add the service name and common variants, but avoid overly broad words.
+      cs: Volitelné názvy, které by mohl útočník napodobit ve falešné doméně. Přidejte název služby a běžné varianty, ale ne příliš obecná slova.
+    example:
+      en: csob penze, csobpenze
+      cs: csob penze, csobpenze

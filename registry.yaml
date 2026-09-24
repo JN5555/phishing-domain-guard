@@ -1,0 +1,84 @@
+name: Phishing Domain Guard
+file: protected-list.json
+items_key: entities
+id_field: id
+display_field: name
+metadata_date_field: updated
+
+fields:
+  name:
+    type: string
+    required: true
+    label:
+      en: Name
+      cs: Název
+
+  id:
+    type: slug
+    required: true
+    unique: true
+    label:
+      en: ID
+      cs: ID
+
+  category:
+    type: choice
+    required: true
+    values:
+      - bank
+      - finance
+      - media
+      - public
+      - identity
+      - other
+    value_labels:
+      bank:
+        en: Bank
+        cs: Banka
+      finance:
+        en: Finance
+        cs: Finance
+      media:
+        en: Media
+        cs: Média
+      public:
+        en: Public institution
+        cs: Veřejná instituce
+      identity:
+        en: Identity
+        cs: Identita
+      other:
+        en: Other
+        cs: Ostatní
+    label:
+      en: Category
+      cs: Kategorie
+
+  source:
+    type: string
+    label:
+      en: Source
+      cs: Zdroj
+
+  domains:
+    type: list
+    required: true
+    validator: hostname
+    unique: true
+    label:
+      en: Main domains
+      cs: Hlavní domény
+
+  hosts:
+    type: list
+    validator: hostname
+    unique: true
+    label:
+      en: Known hosts / login hosts
+      cs: Známé hosty / přihlašovací hosty
+
+  brands:
+    type: list
+    label:
+      en: Brands and aliases
+      cs: Značky a aliasy

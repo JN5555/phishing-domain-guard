@@ -528,6 +528,17 @@
       "brands": [
         "csob penze"
       ]
+    },
+    {
+      "name": "github",
+      "id": "github",
+      "category": "other",
+      "domains": [
+        "github.com"
+      ],
+      "brands": [
+        "github"
+      ]
     }
   ],
   "disabledIds": []

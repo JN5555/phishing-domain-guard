@@ -1,0 +1,51 @@
+// Vestavěná databáze chráněných značek. Je součástí balíčku rozšíření a není uložena
+// do chrome.storage, takže ji uživatel ani stránka nemůže omylem přepsat.
+// `domains` = legitimní registrovatelné domény; `hosts` = známé přihlašovací hosty.
+export const PROTECTED_ENTITIES = [
+  { id:'airbank', name:'Air Bank', category:'bank', source:'ČNB + Air Bank', domains:['airbank.cz'], hosts:['ib.airbank.cz'], brands:['airbank','air bank'] },
+  { id:'creditas', name:'Banka CREDITAS', category:'bank', source:'ČNB', domains:['creditas.cz'], brands:['creditas','banka creditas'] },
+  { id:'ceb', name:'Česká exportní banka', category:'bank', source:'ČNB', domains:['ceb.cz'], brands:['ceb','ceska exportni banka'] },
+  { id:'csas', name:'Česká spořitelna / George', category:'bank', source:'ČNB + Česká spořitelna', domains:['csas.cz'], hosts:['george.csas.cz'], brands:['ceska sporitelna','ceskasporitelna','csas','george'] },
+  { id:'csob', name:'ČSOB', category:'bank', source:'ČNB + ČSOB', domains:['csob.cz'], hosts:['ib.csob.cz','ib24.csob.cz'], brands:['csob','csob banka'] },
+  { id:'cmss', name:'ČSOB Stavební spořitelna', category:'bank', source:'ČNB', domains:['cmss.cz'], brands:['cmss','csob stavebni sporitelna'] },
+  { id:'fio', name:'Fio banka', category:'bank', source:'ČNB + Fio', domains:['fio.cz'], hosts:['ib.fio.cz'], brands:['fio','fio banka','fiobanka'] },
+  { id:'jt', name:'J&T BANKA', category:'bank', source:'ČNB', domains:['jtbank.cz'], brands:['jtbank','jt banka','j&t banka'] },
+  { id:'kb', name:'Komerční banka / Mojebanka', category:'bank', source:'ČNB + KB', domains:['kb.cz','mojebanka.cz'], hosts:['login.kb.cz','plus.kb.cz','mojebanka.cz'], brands:['kb','komercni banka','komercnibanka','mojebanka','moje banka'] },
+  { id:'moneta', name:'MONETA Money Bank', category:'bank', source:'ČNB', domains:['moneta.cz'], brands:['moneta','moneta money bank'] },
+  { id:'nrb', name:'Národní rozvojová banka', category:'bank', source:'ČNB', domains:['nrb.cz'], brands:['nrb','narodni rozvojova banka'] },
+  { id:'partners', name:'Partners Banka', category:'bank', source:'ČNB', domains:['partnersbanka.cz'], brands:['partners banka','partnersbanka'] },
+  { id:'ppf', name:'PPF banka', category:'bank', source:'ČNB', domains:['ppfbanka.cz'], brands:['ppf banka','ppfbanka'] },
+  { id:'rb', name:'Raiffeisenbank', category:'bank', source:'ČNB', domains:['rb.cz'], brands:['rb','raiffeisenbank','raiffeisen banka'] },
+  { id:'rsts', name:'Raiffeisen stavební spořitelna', category:'bank', source:'ČNB', domains:['rsts.cz'], brands:['rsts','raiffeisen stavebni sporitelna'] },
+  { id:'burinka', name:'Buřinka – Stavební spořitelna ČS', category:'bank', source:'ČNB', domains:['burinka.cz'], brands:['burinka','stavebni sporitelna ceske sporitelny'] },
+  { id:'trinity', name:'TRINITY BANK', category:'bank', source:'ČNB', domains:['trinitybank.cz'], brands:['trinity bank','trinitybank'] },
+  { id:'unicredit', name:'UniCredit Bank', category:'bank', source:'ČNB', domains:['unicreditbank.cz'], brands:['unicredit','unicreditbank','unicredit bank'] },
+  { id:'oberbank', name:'Oberbank', category:'bank', source:'ČNB/JERRS', domains:['oberbank.cz'], brands:['oberbank'] },
+  { id:'mbank', name:'mBank', category:'bank', source:'ČNB/JERRS', domains:['mbank.cz'], brands:['mbank','m bank'] },
+  { id:'bankid', name:'Bankovní identita', category:'finance', source:'oficiální web služby', domains:['bankid.cz'], brands:['bankid','bankovni identita'] },
+  { id:'cnb', name:'Česká národní banka', category:'finance', source:'ČNB', domains:['cnb.cz'], brands:['cnb','ceska narodni banka'] },
+
+  { id:'ct', name:'Česká televize / ČT24', category:'media', source:'veřejnoprávní médium / RRTV', domains:['ceskatelevize.cz','ct24.cz'], brands:['ceska televize','ceskatelevize','ct24','ct 24'] },
+  { id:'cro', name:'Český rozhlas / iROZHLAS', category:'media', source:'veřejnoprávní médium / RRTV', domains:['rozhlas.cz','irozhlas.cz'], brands:['cesky rozhlas','irozhlas','radiozurnal'] },
+  { id:'seznamzpravy', name:'Seznam Zprávy', category:'media', source:'ručně ověřená značka', domains:['seznamzpravy.cz'], brands:['seznam zpravy','seznamzpravy'] },
+  { id:'novinky', name:'Novinky.cz', category:'media', source:'ručně ověřená značka', domains:['novinky.cz'], brands:['novinky','novinky cz'] },
+  { id:'idnes', name:'iDNES.cz', category:'media', source:'ručně ověřená značka', domains:['idnes.cz'], brands:['idnes','idnes cz'] },
+  { id:'aktualne', name:'Aktuálně.cz', category:'media', source:'ručně ověřená značka', domains:['aktualne.cz'], brands:['aktualne','aktualne cz'] },
+  { id:'lidovky', name:'Lidovky.cz', category:'media', source:'ručně ověřená značka', domains:['lidovky.cz'], brands:['lidovky','lidove noviny'] },
+  { id:'ihned', name:'Hospodářské noviny / HN', category:'media', source:'ručně ověřená značka', domains:['ihned.cz','hn.cz'], brands:['ihned','hospodarske noviny'] },
+  { id:'denikn', name:'Deník N', category:'media', source:'ručně ověřená značka', domains:['denikn.cz'], brands:['denik n','denikn'] },
+  { id:'respekt', name:'Respekt', category:'media', source:'ručně ověřená značka', domains:['respekt.cz'], brands:['respekt'] },
+  { id:'e15', name:'E15', category:'media', source:'ručně ověřená značka', domains:['e15.cz'], brands:['e15'] },
+  { id:'blesk', name:'Blesk', category:'media', source:'ručně ověřená značka', domains:['blesk.cz'], brands:['blesk'] },
+
+  { id:'financnisprava', name:'Finanční správa', category:'public', source:'orgán veřejné správy', domains:['financnisprava.cz'], brands:['financni sprava','financnisprava'] },
+  { id:'ceskaposta', name:'Česká pošta', category:'public', source:'oficiální web organizace', domains:['ceskaposta.cz'], brands:['ceska posta','ceskaposta'] },
+  { id:'mojeid', name:'mojeID', category:'identity', source:'oficiální web služby', domains:['mojeid.cz'], brands:['mojeid','moje id'] }
+];
+
+export const DEFAULT_PROTECTED = [...new Set(PROTECTED_ENTITIES.flatMap(e => e.domains))];
+export const CATEGORY_LABELS = { bank:'Banky', finance:'Finance', media:'Média', public:'Veřejné instituce', identity:'Identita' };
+
+export function entityForDomain(domain) {
+  return PROTECTED_ENTITIES.find(e => e.domains.includes(domain)) || null;
+}

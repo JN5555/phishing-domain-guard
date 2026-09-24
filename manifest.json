@@ -1,0 +1,48 @@
+{
+  "manifest_version": 3,
+  "name": "Phishing Domain Guard",
+  "version": "0.5.1",
+  "description": "Warns about phishing sites, lookalike domains, protected brands, and risky sign-in pages.",
+  "permissions": [
+    "webNavigation",
+    "storage",
+    "alarms",
+    "unlimitedStorage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://openphish.com/*",
+    "https://phish.co.za/*",
+    "https://rdap.nic.cz/*",
+    "https://rdap.org/*",
+    "https://publicsuffix.org/*",
+    "https://raw.githubusercontent.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "Phishing Domain Guard",
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "16": "icons/16.png",
+    "32": "icons/32.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
+  "homepage_url": "https://github.com/JN5555/phishing-domain-guard"
+}

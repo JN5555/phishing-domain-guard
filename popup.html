@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Phishing Domain Guard</title>
+<link rel="stylesheet" href="popup.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brandmark">P</div>
+  <div class="brandcopy"><div class="appname">Phishing Domain Guard</div><div class="subtitle">Ochrana proti phishingu a napodobeninám</div></div>
+  <div id="version" class="version"></div>
+</header>
+<nav id="tabs" class="tabs" aria-label="Hlavní navigace">
+  <button data-tab="overview" class="on">Přehled</button>
+  <button data-tab="protected">Chráněné</button>
+  <button data-tab="settings">Nastavení</button>
+</nav>
+
+<main id="mainScroll">
+<section id="tab-overview">
+  <div id="verdict" class="hero neutral">
+    <div class="heroIcon" id="heroIcon">?</div>
+    <div><div id="vTitle" class="heroTitle">Kontroluji…</div><div id="vText" class="heroText"></div></div>
+  </div>
+  <div class="card">
+    <div class="cardTitle">Aktuální stránka</div>
+    <dl id="facts" class="facts"></dl>
+    <div id="ageRow" class="ageRow">
+      <button id="ageBtn" class="textButton">Zjistit stáří domény</button>
+      <span id="age" class="muted"></span>
+    </div>
+  </div>
+  <div id="actions" class="actions"></div>
+  <div class="privacyNote">Kontrola názvu probíhá lokálně. RDAP se použije pouze na vyžádání nebo při kontrole přihlašovacího formuláře.</div>
+</section>
+
+<section id="tab-protected" hidden>
+  <div class="stats" id="stats"></div>
+  <div class="toolbar">
+    <div class="searchWrap"><input id="filter" type="search" placeholder="Hledat banku, značku nebo doménu…"></div>
+    <div class="segmented" id="categoryFilter">
+      <button data-cat="all" class="on">Vše</button><button data-cat="bank">Banky</button><button data-cat="media">Média</button><button data-cat="other">Ostatní</button>
+    </div>
+  </div>
+  <div id="entityRows" class="entityRows"></div>
+
+  <div class="sectionHeading"><div><strong>Moje chráněné domény</strong><span>Vlastní položky jsou oddělené od ověřeného seznamu.</span></div></div>
+  <div id="userRows" class="rows"></div>
+  <div class="addrow"><input id="add" placeholder="např. moje-firma.cz"><button id="addBtn" class="primary">Přidat</button></div>
+  <div id="userCount" class="meta"></div>
+</section>
+
+<section id="tab-settings" hidden>
+  <div class="card settingCard remoteCard">
+    <div class="cardTitleRow">
+      <div><div class="cardTitle noMargin">GitHub seznam chráněných domén</div><div class="cardSubtitle">Aktualizuje banky, média a další chráněné značky bez nové verze rozšíření.</div></div>
+      <label class="toggle"><input type="checkbox" id="remoteEnabled"><span></span></label>
+    </div>
+    <label class="fieldLabel" for="remoteUrl">Zdroj JSON</label>
+    <input id="remoteUrl" class="fullInput" type="url" spellcheck="false" placeholder="https://github.com/JN5555/phishing-domain-guard/blob/main/protected-list.json">
+    <div class="twoCols">
+      <div><label class="fieldLabel" for="remoteInterval">Automatická kontrola</label>
+      <select id="remoteInterval"><option value="6">Každých 6 hodin</option><option value="24">Jednou denně</option><option value="168">Jednou týdně</option></select></div>
+      <div class="sourceBadge"><span>Zdroj</span><b>GitHub / HTTPS</b></div>
+    </div>
+    <div class="buttonRow">
+      <button id="saveRemoteBtn" class="primary">Uložit nastavení</button>
+      <button id="syncRemoteBtn">Synchronizovat teď</button>
+      <button id="clearRemoteBtn" class="quiet">Vymazat kopii</button>
+    </div>
+    <div id="remoteStatus" class="statusBox neutralStatus">GitHub synchronizace není zapnutá.</div>
+    <p class="help compactHelp">Stažený soubor je pouze JSON data. Plugin kontroluje jeho strukturu, velikost a domény; vzdálený JavaScript se nespouští. Při chybě zůstane aktivní poslední platná kopie nebo vestavěný seznam.</p>
+  </div>
+
+  <div class="card settingCard">
+    <div class="cardTitle">Veřejné phishingové feedy</div>
+    <label class="switchRow"><span><b>OpenPhish</b><small>Lehký veřejný feed známých phishingových URL</small></span><input type="checkbox" id="openphish"></label>
+    <label class="switchRow"><span><b>Phishing.Database</b><small>Rozsáhlejší seznam; může být větší</small></span><input type="checkbox" id="phishingdb"></label>
+    <button id="refreshBtn">Aktualizovat teď</button>
+    <div class="meta" id="feedStatus"></div>
+  </div>
+
+  <div class="card settingCard">
+    <div class="cardTitle">Přihlašovací formuláře</div>
+    <select id="pwMode">
+      <option value="young">Varovat u nových domén do 90 dnů</option>
+      <option value="always">Varovat u každé neznámé domény</option>
+      <option value="off">Nekontrolovat</option>
+    </select>
+  </div>
+
+  <div class="card settingCard">
+    <div class="cardTitle">Důvěryhodné výjimky</div>
+    <p class="help">Tyto domény přeskočí heuristická varování. Nepřidávejte sem banku jen proto, že varování obtěžuje.</p>
+    <div id="trustedRows" class="rows"></div>
+    <div class="addrow"><input id="addTrusted" placeholder="důvěryhodná-doména.cz"><button id="addTrustedBtn">Přidat</button></div>
+    <div id="trustedCount" class="meta"></div>
+  </div>
+
+  <div class="card settingCard securityCard">
+    <div class="cardTitle">Integrita a ochrana seznamů</div>
+    <div class="securityLine"><span class="shield">✓</span><span>Vestavěný seznam slouží jako bezpečná záloha, pokud GitHub není dostupný.</span></div>
+    <div class="securityLine"><span class="shield">✓</span><span>Úložiště rozšíření je omezené na důvěryhodné kontexty.</span></div>
+    <div class="securityLine"><span class="shield">✓</span><span>GitHub data se před použitím validují a mají limit 1 MB.</span></div>
+    <div class="fingerprint">Otisk vestavěné databáze: <code id="fingerprint">počítám…</code></div>
+  </div>
+</section>
+</main>
+<div id="toast" class="toast" hidden></div>
+<script type="module" src="popup.js"></script>
+</body>
+</html>
